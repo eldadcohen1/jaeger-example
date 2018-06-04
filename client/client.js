@@ -1,6 +1,6 @@
 const delay = require('delay')
 const {get: httpGet, post: httpPost} = require('../utils/http');
-const { initTracer, withSpanGeneric } = require('../utils/tracer.js');
+const { initTracer } = require('../utils/tracer.js');
 const { Tags, FORMAT_HTTP_HEADERS } = require('opentracing');
 
 const tracer = initTracer('client');
@@ -9,7 +9,6 @@ const post = httpPost(tracer);
 const STORE_PORT = 9091;
 const CART_PORT = 9090;
 const USER_NAME = 'yehiyam'
-const withSpan = withSpanGeneric(tracer, USER_NAME);
 
 const getStoreItems = (rootSpan) => {
     const url = `http://localhost:${STORE_PORT}/items`;
@@ -49,6 +48,7 @@ const getCart = async (rootSpan) =>{
         span.finish();
     } catch (error) {
         span.setTag(Tags.ERROR, true)
+        span.log({ 'error.message': error.message });
         span.setTag(Tags.HTTP_STATUS_CODE, error.statusCode || 500);
         span.finish();
     }
@@ -75,7 +75,11 @@ const main = async () => {
 
     // add item 1 to cart
 
-    await addItemToCart(rootSpan,1);
+    await Promise.all([
+        addItemToCart(rootSpan,1),
+        addItemToCart(rootSpan,3)
+    ]);
+    
 
     await getCart(rootSpan);
     
