@@ -1,30 +1,29 @@
-const delay = require('delay')
-const {get: httpGet, post: httpPost} = require('../utils/http');
-const { initTracer } = require('../utils/tracer.js');
-const { Tags, FORMAT_HTTP_HEADERS } = require('opentracing');
+import delay from 'delay';
+import Http from '../utils/http';
+import TracerUtils from '../utils/tracer';
+import { Span } from 'opentracing';
+import  { Tags } from 'opentracing';
 
-const tracer = initTracer('client');
-const get = httpGet(tracer);
-const post = httpPost(tracer);
+const tracer = TracerUtils.initTracer('client');
 const STORE_PORT = 9091;
 const CART_PORT = 9090;
 const USER_NAME = 'yehiyam'
 
-const getStoreItems = (rootSpan) => {
+const getStoreItems = (rootSpan : Span) => {
     const url = `http://localhost:${STORE_PORT}/items`;
     const span = tracer.startSpan('getStoreItems', { childOf: rootSpan.context() });
-    return get(url, span);
+    return Http.get(tracer,url, span);
 }
 
 
 
-const addItemToCart = async (rootSpan, itemIdToAdd) =>{
+const addItemToCart = async (rootSpan: Span, itemIdToAdd: number) =>{
     const span = tracer.startSpan('addItemToCart',{childOf:rootSpan.context()});
     span.setTag('userName', USER_NAME);
     try {
         const url = `http://localhost:${CART_PORT}/cart/${USER_NAME}`;
         
-        await post(url, span,{itemId: itemIdToAdd});
+        await Http.post(tracer,url, span,{itemId: itemIdToAdd});
         
         span.setTag(Tags.HTTP_STATUS_CODE, 200)
         span.finish();
@@ -35,13 +34,13 @@ const addItemToCart = async (rootSpan, itemIdToAdd) =>{
     }
 }
 
-const getCart = async (rootSpan) =>{
+const getCart = async (rootSpan: Span) =>{
     const span = tracer.startSpan('get cart',{childOf:rootSpan.context()});
     span.setTag('userName', USER_NAME);
     try {
         const url = `http://localhost:${CART_PORT}/cart/${USER_NAME}`;
         
-        const cart = await get(url, span);
+        const cart = await Http.get(tracer,url, span);
         console.log(JSON.stringify(cart, null, 2));
 
         span.setTag(Tags.HTTP_STATUS_CODE, 200)
@@ -86,7 +85,7 @@ const main = async () => {
 
     rootSpan.finish();
     await delay(5000);
-    tracer.close();
+    (<any>tracer).close();
 };
 
 main();

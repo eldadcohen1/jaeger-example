@@ -4,8 +4,16 @@
       "module": "commonjs",
       "noImplicitAny": true,
       "outDir": "dist",
-      "sourceMap": true
-    },
+      "sourceMap": true,
+
+      "moduleResolution": "node",
+    "declaration": true,
+
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
+    "strictNullChecks": true,
+    "allowUnreachableCode": false,
+  },
     "files": [
       "./node_modules/@types/mocha/index.d.ts",
       "./node_modules/@types/node/index.d.ts"

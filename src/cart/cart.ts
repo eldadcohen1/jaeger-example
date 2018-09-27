@@ -4,7 +4,7 @@ const app = express();
 
 const delay = require('delay')
 
-const { initTracer } = require('../utils/tracer.js');
+const { initTracer } = require('../utils/tracer');
 const { Tags, FORMAT_HTTP_HEADERS } = require('opentracing');
 const httpGet = require('../utils/http').get;
 

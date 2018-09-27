@@ -2,12 +2,12 @@ const express = require('express');
 const delay = require('delay')
 const app = express();
 
-const { initTracer } = require('../utils/tracer.js');
+import TracerUtils from '../utils/tracer'
 const { Tags, FORMAT_HTTP_HEADERS } = require('opentracing');
 
 const { itemsStub } = require('./items');
 
-const tracer = initTracer('store');
+const tracer = TracerUtils.initTracer('store');
 
 const port = 9091;
 

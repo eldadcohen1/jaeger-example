@@ -1,25 +1,22 @@
-const { initTracer: initJaegerTracer } = require("jaeger-client");
-const { Tags, FORMAT_HTTP_HEADERS } = require('opentracing');
-const { curry } = require('ramda');
+//@ts-ignore
+import {initTracer as initJaegerTracer} from 'jaeger-client';
+import { Tracer } from 'opentracing';
 
-
-const initTracer = serviceName => {
-  const config = {
-    serviceName: serviceName,
-    sampler: {
-      type: "const",
-      param: 1,
-    },
-    reporter: {
-      logSpans: true,
-    },
-  };
-  const options = {
-
+export default class TracerUtils {
+  static initTracer(serviceName : string) : Tracer {
+    const config = {
+      serviceName: serviceName,
+      sampler: {
+        type: "const",
+        param: 1,
+      },
+      reporter: {
+        logSpans: true,
+      },
+    };
+    const options = {
+  
+    }
+    return initJaegerTracer(config, options);
   }
-  return initJaegerTracer(config, options);
-};
-
-module.exports = {
-  initTracer,
 }
